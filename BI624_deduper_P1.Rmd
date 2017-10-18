@@ -9,7 +9,7 @@ output: html_document
 - The problem here is with PCR duplicates. This issue evolves when one or a set of transcipt preferentially gets duplicated during the PCR amplification step. This effectively eliminates the ability to quantify expression levels of the original RNA transcripts. By removing the PCR duplicates, the relative expression levels seen are easier to understand and the bias is decreased. This adds robustness to the data, and allows for more accurate downstream analysis. 
 
 #### What do we need to do to discard PCR duplicates?
-- These duplicates can be recognized by having the same information in a SAM file for multiple alignments. UMIs are used to differentiate sequences from each other. For our purposes, UMIs will be matched exactly and it is unimportant if there are uncalled bases or sequencing error. Only correct UMI containing reads will be retained. The chromsome position and starting position will also be identical between duplicates. Unfortunatly, soft clipping makes it a little more tricky than just finding repeat start positions and chromsome/scaffold number. With soft clipping, the basepair start position becomes 'artifically' shifted right since soft clipped portions do not align to the reference at all but the rest of the sequence does. To compensate for this, we need to check if softclipping has occurred and adjust the starting position accordingly. Then, we can see if there are PCR duplicates that may have just been soft clipped. Soft clipping only occurs at the beginning and end of a sequence. Therefore, even though there is soft clipping that could happen at the end, we are really only interested in soft clipping at the beginning since the start position is all that we care about right now. We are also interested in the strand orientation, denoted by the bitwise flag of either 0 or 16. We only want to retain one record per combination of:
+- These duplicates can be recognized by having the same information in a SAM file for multiple alignments. UMIs are used to differentiate sequences from each other. For our purposes, UMIs will be matched exactly and it is unimportant if there are uncalled bases or sequencing error. Only correct UMI containing reads will be retained. The chromsome position and starting position will also be identical between duplicates. Unfortunately, soft clipping makes it a little more tricky than just finding repeat start positions and chromsome/scaffold number. With soft clipping, the basepair start position becomes 'artifically' shifted right since soft clipped portions do not align to the reference at all but the rest of the sequence does. To compensate for this, we need to check if softclipping has occurred and adjust the starting position accordingly. Then, we can see if there are PCR duplicates based on starting position that may have just been soft clipped. Soft clipping only occurs at the beginning and end of a sequence. Therefore, even though there is soft clipping that could happen at the end, we are really only interested in soft clipping at the beginning since the start position is all that we care about right now. Soft clipping at the end might come into play when we are dealing with paired end data. We are also interested in the strand orientation(forward or reverse), denoted by the bitwise flag of either 0 or 16. We only want to retain one record per combination of:
 
     1. Strand orientation
     2. Known UMI
@@ -32,11 +32,11 @@ output: html_document
           - check if the chromsome is equal to the previous value and if it is then continue on
           - set current chromosome value equal to past chromosome value
           - generate a tuple of this information
-          - check if the tuple is in the dictionary, if not then add it to the dictionary with a count of 1 and write that line to an output file
+          - check if the tuple is in the dictionary, if not then add it to the dictionary with a count of 1 and write that line to an output file * the counter here acts as a sanity check, since if the dictionary is printed and there are numbers >1, then there is a bug in the code
           - if it isnt then move on to the next line and do nothing else to this line
 
 
-**Notes about this assignmnet for later**
+**Notes about this assignmnet that I am just retaining for myself**
 
 deduper
 - umis will not be inline
