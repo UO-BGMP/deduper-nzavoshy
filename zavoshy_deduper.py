@@ -70,7 +70,7 @@ with open(umi_file, 'r') as umis, open(file, 'r') as file:
     for line in file:
         if line.startswith('@'):
             line=line.strip('\n')
-            file= open(output+'_deduped.txt', 'a+')
+            file= open(output+'_deduped', 'a+')
             file.write(line)
             file.close
         else:
@@ -92,7 +92,7 @@ with open(umi_file, 'r') as umis, open(file, 'r') as file:
                 #if tup_dict[info]==umi:
                 if info in tup_dict:
                     
-                    file= open(output+'_deduped_discard.txt', 'a+')
+                    file= open(output+'_deduped_discard', 'a+')
 
                     file.write(line)
                     file.close()
@@ -102,13 +102,13 @@ with open(umi_file, 'r') as umis, open(file, 'r') as file:
 
                     tup_dict[info]=0
 
-                    file= open(output+'_deduped.txt', 'a')
+                    file= open(output+'_deduped', 'a')
 
                     file.write(line)
 
                     file.close()
             else:
-                file= open(output+'_deduped_discard.txt', 'a+')
+                file= open(output+'_deduped_discard', 'a+')
 
                 file.write(line)
                 file.close()
