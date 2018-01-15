@@ -3,10 +3,10 @@
 
 import argparse
 
-parser = argparse.ArgumentParser(description="A program to remove PCR duplicates from SAM file.")
-parser.add_argument("-f", "--file", help='absolute file path to sam file',required=True,type= str)
-parser.add_argument("-p", "--paired", help='if data is paired, use this flag with no arguements to indicate paired end data.',required=False,action='store_true')
-parser.add_argument("-u", "--umi", help='file with known umis. No option for randomers at this time',required=False,type= str)
+parser = argparse.ArgumentParser(description="A program to remove PCR duplicates from SAM file. The input file is assumed to be sorted using samtools sort. There will be two output files. One of them will be discarded reads deemed duplicates and the other will be retained reads free of PCR duplicates.")
+parser.add_argument("-f", "--file", help='absolute file path to sam file to have replicates removed',required=True,type= str)
+parser.add_argument("-p", "--paired", help='if data is paired, use this flag with no arguements to indicate paired end data. Paired end capability not available at this time.',required=False,action='store_true')
+parser.add_argument("-u", "--umi", help='absolute file path with known umis. No option for randomers at this time',required=False,type= str)
 
 args = parser.parse_args()
 
@@ -49,7 +49,7 @@ def soft_clip(cigar,pos):
     '''checks for softclipping and then edits as necessary'''
     import re
     if re.match( r'([0-9]+)S([0-9]+)M*', cigar):
-        match=re.match( r'([0-9]+)S([0-9]+)M*', cigar)
+        match=re.match( r'([0-9]+)S([0-9]+)M*', cigar) #this checks for soft clipping in the cigar string
         adj_start=int(pos)- int(match.group(1))
         return adj_start
     else:
@@ -68,7 +68,7 @@ with open(umi_file, 'r') as umis, open(file, 'r') as file:
 
 
     for line in file:
-        if line.startswith('@'):
+        if line.startswith('@'): #this portion of the code will write the header lines out to the file
             line=line.strip('\n')
             file= open(output+'_deduped', 'a+')
             file.write(line)
@@ -84,7 +84,7 @@ with open(umi_file, 'r') as umis, open(file, 'r') as file:
             cigar=soft_clip(newline[5],pos)
 
 
-            info=(chrom,cigar,bit,umi)
+            info=(chrom,cigar,bit,umi) #this saves the necessary information to determine if two things are PCR duplicates
             #print(info)
 
             if umi in umi_dict:
